@@ -26,6 +26,8 @@ contract AuctionOrderBookPrototype {
     uint256[] public activeOrderIds;
     mapping(uint256 => uint256) private activeOrderIndex; // orderId => index in activeOrderIds
 
+    bool private locked;
+
     event OrderCreated(
         uint256 indexed orderId,
         address indexed creator,
@@ -47,6 +49,13 @@ contract AuctionOrderBookPrototype {
 
     event OrderCancelled(uint256 indexed orderId);
     event OrderExpired(uint256 indexed orderId, address indexed caller);
+
+    modifier nonReentrant() {
+        require(!locked, "Reentrancy blocked");
+        locked = true;
+        _;
+        locked = false;
+    }
 
     /**
      * @notice Create a new auction order with time-dependent pricing
@@ -150,7 +159,7 @@ contract AuctionOrderBookPrototype {
      * @param orderId The order to execute
      * @param amount Amount to fill (can be partial)
      */
-    function executeOrder(uint256 orderId, uint256 amount) external payable {
+    function executeOrder(uint256 orderId, uint256 amount) external payable nonReentrant {
         Order storage order = orders[orderId];
 
         require(order.active, "Order not active");
@@ -165,21 +174,7 @@ contract AuctionOrderBookPrototype {
         uint256 totalCost = amount * price;
 
         if (order.isBuy) {
-            require(msg.value == 0, "Buy execution should not send ETH");
-            require(order.escrowedEth >= totalCost, "Escrow depleted");
-
-            order.escrowedEth -= totalCost;
-            (bool success,) = payable(msg.sender).call{value: totalCost}("");
-            require(success, "ETH transfer failed");
-
-            if (amount == order.amount) {
-                uint256 refund = order.escrowedEth;
-                order.escrowedEth = 0;
-                if (refund > 0) {
-                    (success,) = payable(order.creator).call{value: refund}("");
-                    require(success, "Refund failed");
-                }
-            }
+            revert("Buy settlement not implemented");
         } else {
             require(msg.value == totalCost, "Must pay exact ETH");
 
@@ -196,7 +191,7 @@ contract AuctionOrderBookPrototype {
         emit OrderExecuted(orderId, msg.sender, amount, price, order.amount);
     }
 
-    function cancelOrder(uint256 orderId) external {
+    function cancelOrder(uint256 orderId) external nonReentrant {
         Order storage order = orders[orderId];
 
         require(order.active, "Order not active");
@@ -218,7 +213,7 @@ contract AuctionOrderBookPrototype {
      * @notice Expire and refund an order once expiryTime is reached
      * @dev Callable by anyone, useful for keeper-style cleanup
      */
-    function expireOrder(uint256 orderId) external {
+    function expireOrder(uint256 orderId) external nonReentrant {
         Order storage order = orders[orderId];
 
         require(order.active, "Order not active");

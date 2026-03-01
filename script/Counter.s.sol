@@ -2,6 +2,7 @@
 pragma solidity ^0.8.19;
 
 import {Script} from "forge-std/Script.sol";
+import {console2} from "forge-std/console2.sol";
 import {Counter} from "../src/Counter.sol";
 
 contract CounterScript is Script {
@@ -16,7 +17,7 @@ contract CounterScript is Script {
 
         // Deploy the contract
         Counter counter = new Counter();
-        console.log("Counter deployed at:", address(counter));
+        console2.log("Counter deployed at:", address(counter));
 
         // Stop broadcasting
         vm.stopBroadcast();

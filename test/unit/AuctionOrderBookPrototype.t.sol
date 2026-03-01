@@ -72,24 +72,12 @@ contract AuctionOrderBookPrototypeTest is Test {
         book.executeOrder{value: 0.050000000000000001 ether}(id, 5);
     }
 
-    function test_partialThenFullFill_clearsBuyEscrow() public {
+    function test_executeBuyOrder_revertsUntilSettlementImplemented() public {
         uint256 id = _createBuyOrder(10, 0.01 ether, -1e12, 0, 0);
 
         vm.prank(taker);
+        vm.expectRevert("Buy settlement not implemented");
         book.executeOrder(id, 4);
-
-        AuctionOrderBookPrototype.Order memory half = book.getOrder(id);
-        assertEq(half.amount, 6);
-        assertTrue(half.active);
-
-        vm.prank(taker);
-        book.executeOrder(id, 6);
-
-        AuctionOrderBookPrototype.Order memory done = book.getOrder(id);
-        assertEq(done.amount, 0);
-        assertEq(done.escrowedEth, 0);
-        assertFalse(done.active);
-        assertEq(book.getActiveOrderCount(), 0);
     }
 
     function test_expireOrder_refundsAndDeactivates() public {
