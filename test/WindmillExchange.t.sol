@@ -293,6 +293,9 @@ contract WindmillExchangeTest is Test {
         );
         uint256 buyId = _placeBuyOrder(); // wants 10 tokenB
 
+        uint256 makerBBefore = tokenB.balanceOf(maker);
+        uint256 takerABefore = tokenA.balanceOf(taker);
+
         exchange.matchOrders(buyId, sellId);
 
         // Sell order fully consumed → inactive
@@ -302,6 +305,28 @@ contract WindmillExchangeTest is Test {
         // Buy order still active (only partial fill)
         (, , , , , , bool buyActive) = exchange.getOrder(buyId);
         assertTrue(buyActive);
+
+        // settlementPrice = (1000e18 + 900e18) / 2 = 950e18
+        // fillSell = 5e18 (capped by sell.remainingSell; also fits buyer demand cap of 10e18)
+        // fillBuy  = (5e18 * 950e18) / 1e18 = 4750e18
+        assertEq(tokenB.balanceOf(maker),  makerBBefore + 5e18,    "buyer received wrong tokenB");
+        assertEq(tokenA.balanceOf(taker),  takerABefore + 4750e18, "seller received wrong tokenA");
+
+        // Seller cannot cancel an already-inactive order
+        vm.prank(taker);
+        vm.expectRevert("Order not active");
+        exchange.cancelOrder(sellId);
+
+        // sell.remainingSell was fully consumed → no residual for seller to withdraw
+        vm.prank(taker);
+        vm.expectRevert("No residual to withdraw");
+        exchange.withdrawResidual(sellId);
+
+        // Buyer can cancel the still-active order and recover remaining payment escrow
+        uint256 makerABeforeCancel = tokenA.balanceOf(maker);
+        vm.prank(maker);
+        exchange.cancelOrder(buyId);
+        assertGt(tokenA.balanceOf(maker), makerABeforeCancel, "buyer escrow not returned on cancel");
     }
 
     // Test 12 — matchOrders expired order reverts

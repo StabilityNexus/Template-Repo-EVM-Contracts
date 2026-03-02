@@ -33,6 +33,12 @@ interface IWindmill {
         address keeper
     );
 
+    event ResidualWithdrawn(
+        uint256 indexed orderId,
+        address indexed maker,
+        uint256 amount
+    );
+
     function nextOrderId() external view returns (uint256);
 
     function getOrder(
@@ -68,4 +74,5 @@ interface IWindmill {
 
     function cancelOrder(uint256 orderId) external;
     function matchOrders(uint256 buyOrderId, uint256 sellOrderId) external;
+    function withdrawResidual(uint256 orderId) external;
 }

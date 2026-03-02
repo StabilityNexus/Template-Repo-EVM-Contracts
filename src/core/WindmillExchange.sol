@@ -42,7 +42,7 @@ contract WindmillExchange is IWindmill, ReentrancyGuard {
         int256 slope,
         uint256 endPrice,
         uint256 expiry
-    ) external returns (uint256 orderId) {
+    ) external nonReentrant returns (uint256 orderId) {
         require(expiry > block.timestamp, "Expiry in the past");
         require(buyAmount > 0, "buyAmount is zero");
         require(sellAmount > 0, "sellAmount is zero");
@@ -70,12 +70,6 @@ contract WindmillExchange is IWindmill, ReentrancyGuard {
                 "SELL: endPrice must be above startPrice"
             );
         }
-
-        IERC20(sellToken).safeTransferFrom(
-            msg.sender,
-            address(this),
-            sellAmount
-        );
 
         orderId = nextOrderId;
         nextOrderId++;
@@ -111,6 +105,13 @@ contract WindmillExchange is IWindmill, ReentrancyGuard {
             slope,
             expiry
         );
+
+        // Interaction last — CEI: all state written before external call
+        IERC20(sellToken).safeTransferFrom(
+            msg.sender,
+            address(this),
+            sellAmount
+        );
     }
 
     //  cancelOrder 
@@ -121,10 +122,25 @@ contract WindmillExchange is IWindmill, ReentrancyGuard {
 
         o.active = false;
         uint256 refund = o.remainingSell;
+        o.remainingSell = 0;
 
         emit OrderCancelled(orderId, msg.sender, refund);
 
         IERC20(o.sellToken).safeTransfer(msg.sender, refund);
+    }
+
+    //  withdrawResidual — lets maker recover escrowed sellToken after auto-deactivation
+    function withdrawResidual(uint256 orderId) external nonReentrant {
+        Order storage o = _orders[orderId];
+        require(o.maker == msg.sender, "Not order maker");
+        uint256 residual = o.remainingSell;
+        require(residual > 0, "No residual to withdraw");
+
+        o.remainingSell = 0;
+
+        emit ResidualWithdrawn(orderId, msg.sender, residual);
+
+        IERC20(o.sellToken).safeTransfer(msg.sender, residual);
     }
 
     //  matchOrders 
@@ -166,9 +182,12 @@ contract WindmillExchange is IWindmill, ReentrancyGuard {
         uint256 settlementPrice = (bp + sp) / 2;
 
         uint256 maxSellFromBuyer = (buy.remainingSell * 1e18) / settlementPrice;
-        uint256 fillSell = maxSellFromBuyer < sell.remainingSell
-            ? maxSellFromBuyer
-            : sell.remainingSell;
+        // Cap by seller's remaining demand (in commodity units) to prevent sell.remainingBuy underflow
+        uint256 maxSellBySellerDemand = (sell.remainingBuy * 1e18) / settlementPrice;
+        uint256 fillSell = maxSellFromBuyer;
+        if (buy.remainingBuy < fillSell) fillSell = buy.remainingBuy;         // cap: buyer demand
+        if (sell.remainingSell < fillSell) fillSell = sell.remainingSell;     // cap: seller supply
+        if (maxSellBySellerDemand < fillSell) fillSell = maxSellBySellerDemand; // cap: seller demand
         uint256 fillBuy = (fillSell * settlementPrice) / 1e18;
 
         buy.remainingSell -= fillBuy;
