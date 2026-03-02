@@ -5,6 +5,7 @@ libs = ["lib"]
 test = "test"
 script = "script"
 cache = true
+solc="0.8.24"
 
 # Optimization settings
 optimizer = true
