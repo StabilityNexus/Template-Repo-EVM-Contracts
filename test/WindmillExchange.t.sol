@@ -309,8 +309,16 @@ contract WindmillExchangeTest is Test {
         // settlementPrice = (1000e18 + 900e18) / 2 = 950e18
         // fillSell = 5e18 (capped by sell.remainingSell; also fits buyer demand cap of 10e18)
         // fillBuy  = (5e18 * 950e18) / 1e18 = 4750e18
-        assertEq(tokenB.balanceOf(maker),  makerBBefore + 5e18,    "buyer received wrong tokenB");
-        assertEq(tokenA.balanceOf(taker),  takerABefore + 4750e18, "seller received wrong tokenA");
+        assertEq(
+            tokenB.balanceOf(maker),
+            makerBBefore + 5e18,
+            "buyer received wrong tokenB"
+        );
+        assertEq(
+            tokenA.balanceOf(taker),
+            takerABefore + 4750e18,
+            "seller received wrong tokenA"
+        );
 
         // Seller cannot cancel an already-inactive order
         vm.prank(taker);
@@ -326,7 +334,11 @@ contract WindmillExchangeTest is Test {
         uint256 makerABeforeCancel = tokenA.balanceOf(maker);
         vm.prank(maker);
         exchange.cancelOrder(buyId);
-        assertGt(tokenA.balanceOf(maker), makerABeforeCancel, "buyer escrow not returned on cancel");
+        assertGt(
+            tokenA.balanceOf(maker),
+            makerABeforeCancel,
+            "buyer escrow not returned on cancel"
+        );
     }
 
     // Test 12 — matchOrders expired order reverts

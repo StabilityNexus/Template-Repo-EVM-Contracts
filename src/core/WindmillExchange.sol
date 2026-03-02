@@ -114,7 +114,7 @@ contract WindmillExchange is IWindmill, ReentrancyGuard {
         );
     }
 
-    //  cancelOrder 
+    //  cancelOrder
     function cancelOrder(uint256 orderId) external nonReentrant {
         Order storage o = _orders[orderId];
         require(o.maker == msg.sender, "Not order maker");
@@ -143,7 +143,7 @@ contract WindmillExchange is IWindmill, ReentrancyGuard {
         IERC20(o.sellToken).safeTransfer(msg.sender, residual);
     }
 
-    //  matchOrders 
+    //  matchOrders
     function matchOrders(
         uint256 buyOrderId,
         uint256 sellOrderId
@@ -183,10 +183,11 @@ contract WindmillExchange is IWindmill, ReentrancyGuard {
 
         uint256 maxSellFromBuyer = (buy.remainingSell * 1e18) / settlementPrice;
         // Cap by seller's remaining demand (in commodity units) to prevent sell.remainingBuy underflow
-        uint256 maxSellBySellerDemand = (sell.remainingBuy * 1e18) / settlementPrice;
+        uint256 maxSellBySellerDemand = (sell.remainingBuy * 1e18) /
+            settlementPrice;
         uint256 fillSell = maxSellFromBuyer;
-        if (buy.remainingBuy < fillSell) fillSell = buy.remainingBuy;         // cap: buyer demand
-        if (sell.remainingSell < fillSell) fillSell = sell.remainingSell;     // cap: seller supply
+        if (buy.remainingBuy < fillSell) fillSell = buy.remainingBuy; // cap: buyer demand
+        if (sell.remainingSell < fillSell) fillSell = sell.remainingSell; // cap: seller supply
         if (maxSellBySellerDemand < fillSell) fillSell = maxSellBySellerDemand; // cap: seller demand
         uint256 fillBuy = (fillSell * settlementPrice) / 1e18;
 
@@ -212,7 +213,7 @@ contract WindmillExchange is IWindmill, ReentrancyGuard {
         IERC20(sell.sellToken).safeTransfer(buy.maker, fillSell);
     }
 
-    //  Read functions 
+    //  Read functions
     function getOrder(
         uint256 orderId
     )
