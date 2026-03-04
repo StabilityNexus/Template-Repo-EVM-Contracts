@@ -32,6 +32,19 @@ contract WindmillExchange is IWindmill, ReentrancyGuard {
     mapping(uint256 => Order) internal _orders;
     mapping(bytes32 => uint256[]) public pairOrders;
 
+    function _min2(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a < b ? a : b;
+    }
+
+    function _min4(
+        uint256 a,
+        uint256 b,
+        uint256 c,
+        uint256 d
+    ) internal pure returns (uint256) {
+        return _min2(_min2(a, b), _min2(c, d));
+    }
+
     //  placeOrder
     function placeOrder(
         address buyToken,
@@ -182,13 +195,15 @@ contract WindmillExchange is IWindmill, ReentrancyGuard {
         uint256 settlementPrice = (bp + sp) / 2;
 
         uint256 maxSellFromBuyer = (buy.remainingSell * 1e18) / settlementPrice;
-        // Cap by seller's remaining demand (in commodity units) to prevent sell.remainingBuy underflow
+        // Convert seller demand (buy-token units) into max sell-token units.
         uint256 maxSellBySellerDemand = (sell.remainingBuy * 1e18) /
             settlementPrice;
-        uint256 fillSell = maxSellFromBuyer;
-        if (buy.remainingBuy < fillSell) fillSell = buy.remainingBuy; // cap: buyer demand
-        if (sell.remainingSell < fillSell) fillSell = sell.remainingSell; // cap: seller supply
-        if (maxSellBySellerDemand < fillSell) fillSell = maxSellBySellerDemand; // cap: seller demand
+        uint256 fillSell = _min4(
+            maxSellFromBuyer,
+            sell.remainingSell,
+            buy.remainingBuy,
+            maxSellBySellerDemand
+        );
         uint256 fillBuy = (fillSell * settlementPrice) / 1e18;
 
         buy.remainingSell -= fillBuy;
