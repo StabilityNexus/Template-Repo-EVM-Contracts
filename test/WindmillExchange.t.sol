@@ -92,6 +92,54 @@ contract WindmillExchangeTest is Test {
             );
     }
 
+    function test_withdrawResidual_revert_noResidual() public {
+        uint256 id = _placeBuyOrder();
+        vm.prank(maker);
+        exchange.cancelOrder(id);
+        vm.prank(maker);
+        vm.expectRevert("No residual to withdraw");
+        exchange.withdrawResidual(id);
+    }
+
+    function test_withdrawResidual_doubleWithdraw() public {
+        vm.prank(taker);
+        uint256 sellId = exchange.placeOrder(
+            address(tokenA),
+            address(tokenB),
+            950e18,
+            5e18,
+            SELL_START,
+            SELL_SLOPE,
+            SELL_END,
+            block.timestamp + 1 hours
+        );
+        uint256 buyId = _placeBuyOrder();
+
+        uint256 takerBBefore = tokenB.balanceOf(taker);
+
+        exchange.matchOrders(buyId, sellId);
+
+        vm.prank(taker);
+        exchange.withdrawResidual(sellId);
+
+        assertGt(
+            tokenB.balanceOf(taker),
+            takerBBefore,
+            "residual not withdrawn"
+        );
+
+        vm.prank(taker);
+        vm.expectRevert("No residual to withdraw");
+        exchange.withdrawResidual(sellId);
+    }
+
+    function test_withdrawResidual_revert_activeOrder() public {
+        uint256 id = _placeBuyOrder();
+        vm.prank(maker);
+        vm.expectRevert("Order still active");
+        exchange.withdrawResidual(id);
+    }
+
     // Test 1 — placeOrder stores exact fields
 
     function test_placeOrder_storesExactFields() public {

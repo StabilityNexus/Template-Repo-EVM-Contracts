@@ -146,6 +146,7 @@ contract WindmillExchange is IWindmill, ReentrancyGuard {
     function withdrawResidual(uint256 orderId) external nonReentrant {
         Order storage o = _orders[orderId];
         require(o.maker == msg.sender, "Not order maker");
+        require(!o.active, "Order still active");
         uint256 residual = o.remainingSell;
         require(residual > 0, "No residual to withdraw");
 
@@ -205,6 +206,8 @@ contract WindmillExchange is IWindmill, ReentrancyGuard {
             maxSellBySellerDemand
         );
         uint256 fillBuy = (fillSell * settlementPrice) / 1e18;
+
+        require(fillSell > 0, "Zero-fill");
 
         buy.remainingSell -= fillBuy;
         buy.remainingBuy -= fillSell;
