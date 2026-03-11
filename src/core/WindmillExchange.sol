@@ -21,9 +21,21 @@ error OrderExpired();
 error SelfMatch();
 error NoCross();
 error PairMismatch();
+error ZeroSettlementPrice();
 
 contract WindmillExchange is OrderStorage, PairStorage, IWindmillExchange {
 
+    // ─── Inline Reentrancy Guard ─────────────────────────────────────────────
+    uint256 private _reentrancyStatus = 1;
+
+    modifier nonReentrant() {
+        require(_reentrancyStatus == 1, "WindmillExchange: reentrant call");
+        _reentrancyStatus = 2;
+        _;
+        _reentrancyStatus = 1;
+    }
+
+    // ─── Events ──────────────────────────────────────────────────────────────
     event OrderCreated(
         uint256 indexed orderId,
         address indexed maker,
@@ -43,8 +55,11 @@ contract WindmillExchange is OrderStorage, PairStorage, IWindmillExchange {
     event OrderFilled(uint256 indexed orderId);
     event OrderPartiallyFilled(uint256 indexed orderId, uint256 remainingIn);
 
+    // ─── Constants ───────────────────────────────────────────────────────────
     uint256 private constant MAX_LIFETIME    = 315_360_000;
     uint256 private constant SLOPE_ABS_LIMIT = type(uint128).max / MAX_LIFETIME;
+
+    // ─── External Functions ───────────────────────────────────────────────────
 
     function createOrder(
         address tokenIn,
@@ -57,6 +72,7 @@ contract WindmillExchange is OrderStorage, PairStorage, IWindmillExchange {
         uint256 expiry,
         bool    isBuy
     ) external override returns (uint256 orderId) {
+        // Checks
         if (tokenIn == address(0) || tokenOut == address(0)) revert ZeroAddress();
         if (tokenIn == tokenOut)                             revert ZeroAddress();
         if (amountIn == 0)                                   revert ZeroAmount();
@@ -65,11 +81,12 @@ contract WindmillExchange is OrderStorage, PairStorage, IWindmillExchange {
         if (maxPrice != 0 && maxPrice < minPrice)            revert InvalidPriceBounds();
         if (slope != 0 && MathUtils.abs(slope) > SLOPE_ABS_LIMIT) revert SlopeOverflow();
 
-        TokenTransfer.safeTransferFrom(tokenIn, msg.sender, address(this), amountIn);
-
+        // Effects — store and register BEFORE the external transfer (CEI)
         Order memory order = Order({
             id:          0,
             maker:       msg.sender,
+            isBuy:       isBuy,
+            active:      true,
             tokenIn:     tokenIn,
             tokenOut:    tokenOut,
             amountIn:    amountIn,
@@ -79,18 +96,19 @@ contract WindmillExchange is OrderStorage, PairStorage, IWindmillExchange {
             minPrice:    minPrice,
             maxPrice:    maxPrice,
             createdAt:   block.timestamp,
-            expiry:      expiry,
-            isBuy:       isBuy,
-            active:      true
+            expiry:      expiry
         });
 
         orderId = _storeOrder(order);
         _addOrderToPair(tokenIn, tokenOut, orderId);
 
+        // Interactions
+        TokenTransfer.safeTransferFrom(tokenIn, msg.sender, address(this), amountIn);
+
         emit OrderCreated(orderId, msg.sender, tokenIn, tokenOut, amountIn, isBuy);
     }
 
-    function cancelOrder(uint256 orderId) external override {
+    function cancelOrder(uint256 orderId) external override nonReentrant {
         Order storage order = _getOrder(orderId);
 
         if (order.maker != msg.sender) revert NotMaker();
@@ -100,15 +118,17 @@ contract WindmillExchange is OrderStorage, PairStorage, IWindmillExchange {
         address tokenIn  = order.tokenIn;
         address tokenOut = order.tokenOut;
 
+        // Effects before interaction
         _deactivateOrder(orderId);
         _removeOrderFromPair(tokenIn, tokenOut, orderId);
 
+        // Interaction
         TokenTransfer.safeTransfer(tokenIn, msg.sender, refund);
 
         emit OrderCancelled(orderId, msg.sender, refund);
     }
 
-    function matchOrders(uint256 buyOrderId, uint256 sellOrderId) external override {
+    function matchOrders(uint256 buyOrderId, uint256 sellOrderId) external override nonReentrant {
         Order memory buy  = _getOrderMem(buyOrderId);
         Order memory sell = _getOrderMem(sellOrderId);
 
@@ -125,6 +145,7 @@ contract WindmillExchange is OrderStorage, PairStorage, IWindmillExchange {
         uint256 newBuyRemaining  = buy.remainingIn  - paymentOwed;
         uint256 newSellRemaining = sell.remainingIn - filledAsset;
 
+        // Effects
         if (buyFilled) {
             _deactivateOrder(buyOrderId);
             _removeOrderFromPair(buy.tokenIn, buy.tokenOut, buyOrderId);
@@ -139,6 +160,7 @@ contract WindmillExchange is OrderStorage, PairStorage, IWindmillExchange {
             _updateRemainingIn(sellOrderId, newSellRemaining);
         }
 
+        // Interactions
         TokenTransfer.safeTransfer(sell.tokenIn, buy.maker,  filledAsset);
         TokenTransfer.safeTransfer(buy.tokenIn,  sell.maker, paymentOwed);
 
@@ -159,6 +181,35 @@ contract WindmillExchange is OrderStorage, PairStorage, IWindmillExchange {
     {
         return PriceCurve.currentPriceMem(_getOrderMem(orderId), timestamp);
     }
+
+    function getOrder(uint256 orderId)
+        external
+        view
+        override
+        returns (Order memory)
+    {
+        return _getOrderMem(orderId);
+    }
+
+    function getOrdersByPair(address tokenA, address tokenB)
+        external
+        view
+        override
+        returns (uint256[] memory)
+    {
+        return _getOrdersByPair(tokenA, tokenB);
+    }
+
+    function totalOrders()
+        external
+        view
+        override
+        returns (uint256)
+    {
+        return _totalOrders();
+    }
+
+    // ─── Internal Helpers ────────────────────────────────────────────────────
 
     function _validateMatch(Order memory buy, Order memory sell, uint256 ts) private pure {
         if (!buy.active)                                          revert OrderInactive();
@@ -183,7 +234,7 @@ contract WindmillExchange is OrderStorage, PairStorage, IWindmillExchange {
         bool    sellFilled
     ) {
         settlementPx = PriceCurve.settlementPrice(buy, sell, ts);
-        if (settlementPx == 0) return (0, 0, 0, false, false);
+        if (settlementPx == 0) revert ZeroSettlementPrice();
 
         uint256 maxAssetFromBuy = MathUtils.mulDiv(buy.remainingIn, settlementPx, MathUtils.RAY);
         filledAsset = maxAssetFromBuy < sell.remainingIn ? maxAssetFromBuy : sell.remainingIn;

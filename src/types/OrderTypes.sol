@@ -1,9 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+/// @notice Core order struct with tightly-packed fields.
+/// @dev    `maker` (20 bytes) + `isBuy` (1 byte) + `active` (1 byte) = 22 bytes,
+///         which fits in a single 32-byte storage slot together.
 struct Order {
     uint256 id;
     address maker;
+    bool    isBuy;
+    bool    active;
     address tokenIn;
     address tokenOut;
     uint256 amountIn;
@@ -14,13 +19,6 @@ struct Order {
     uint256 maxPrice;
     uint256 createdAt;
     uint256 expiry;
-    bool isBuy;
-    bool active;
-}
-
-struct PairKey {
-    address token0;
-    address token1;
 }
 
 function pairKeyOf(address tokenA, address tokenB) pure returns (bytes32) {

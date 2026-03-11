@@ -24,4 +24,10 @@ interface IWindmillExchange {
         external
         view
         returns (uint256 price);
+
+    function getOrder(uint256 orderId) external view returns (Order memory);
+
+    function getOrdersByPair(address tokenA, address tokenB) external view returns (uint256[] memory);
+
+    function totalOrders() external view returns (uint256);
 }

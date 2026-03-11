@@ -54,6 +54,25 @@ library MathUtils {
         return (a & b) + ((a ^ b) >> 1);
     }
 
+    /// @notice Clamps `value` to the range [`lo`, `hi`].
+    /// @dev    A bound value of **0 means "unbounded"** — i.e., 0 disables that bound
+    ///         rather than enforcing a literal bound of zero.
+    ///         - `lo == 0`: no lower bound is applied; `value` may be any amount ≥ 0.
+    ///         - `hi == 0`: no upper bound is applied; `value` may be any amount.
+    ///         - Both `lo` and `hi` are 0: `value` is returned unchanged.
+    ///
+    ///         Examples:
+    ///           clamp(5, 10, 20) → 10  (below lower bound)
+    ///           clamp(15, 10, 20) → 15 (within range)
+    ///           clamp(25, 10, 20) → 20 (above upper bound)
+    ///           clamp(5,  0, 20)  → 5  (no lower bound; within upper)
+    ///           clamp(25, 0, 20)  → 20 (no lower bound; exceeds upper)
+    ///           clamp(5, 10, 0)   → 10 (below lower bound; no upper bound)
+    ///           clamp(5,  0,  0)  → 5  (fully unbounded; returned as-is)
+    /// @param value The value to clamp.
+    /// @param lo    Lower bound (pass 0 to disable).
+    /// @param hi    Upper bound (pass 0 to disable).
+    /// @return      The clamped value.
     function clamp(uint256 value, uint256 lo, uint256 hi) internal pure returns (uint256) {
         if (lo != 0 && value < lo) return lo;
         if (hi != 0 && value > hi) return hi;
