@@ -55,62 +55,136 @@
 
 ---
 
+## 🚀 Features
+
+TODO: List your main features here:
+
+- **Feature 1**: Description
+- **Feature 2**: Description
+- **Feature 3**: Description
+- **Feature 4**: Description
+
+---
+
 ## Project Maturity
 
 TODO: In the checklist below, mark the items that have been completed and delete items that are not applicable to the current project:
 
-* [ ] The project has a logo.
-* [ ] The project has a favicon.
-* [ ] The protocol:
-   - [ ] has been described and formally specified in a paper.
-   - [ ] has had its main properties mathematically proven.
-   - [ ] has been formally verified.
-* [ ] The smart contracts:
-   - [ ] were thoroughly reviewed by at least two knights of The Stable Order.
-   - [ ] were deployed to:
-      - [ ] Ergo
-      - [ ] Cardano
-      - [ ] EVM Chains:
-        - [ ] Ethereum Classic
-        - [ ] Ethereum
-        - [ ] Polygon
-        - [ ] BSC
-        - [ ] Base
-* [ ] The mobile app:
-   - [ ] has an _About_ page containing the Stability Nexus's logo and pointing to the social media accounts of the Stability Nexus.
-   - [ ] is available for download as a release in this repo.
-   - [ ] is available in the relevant app stores.
-* [ ] The web frontend:
-   - [ ] has proper title and metadata.
-   - [ ] has proper open graph metadata, to ensure that it is shown well when shared in social media (Discord, Telegram, Twitter, LinkedIn).
-   - [ ] has a footer, containing the Stability Nexus's logo and pointing to the social media accounts of the Stability Nexus.
-   - [ ] is fully static and client-side.
-   - [ ] is deployed to Github Pages via a Github Workflow.
-   - [ ] is accessible through the https://TODO:PROJECT-NAME.stability.nexus domain.
-* [ ] the project is listed in [https://stability.nexus/protocols](https://stability.nexus/protocols).
+- [ ] The project has a logo.
+- [ ] The project has a favicon.
+- [ ] The protocol:
+  - [ ] has been described and formally specified in a paper.
+  - [ ] has had its main properties mathematically proven.
+  - [ ] has been formally verified.
+- [ ] The smart contracts:
+  - [ ] were thoroughly reviewed by at least two knights of The Stable Order.
+  - [ ] were deployed to:
+    - [ ] Ergo
+    - [ ] Cardano
+    - [ ] EVM Chains:
+      - [ ] Ethereum Classic
+      - [ ] Ethereum
+      - [ ] Polygon
+      - [ ] BSC
+      - [ ] Base
+- [ ] The mobile app:
+  - [ ] has an _About_ page containing the Stability Nexus's logo and pointing to the social media accounts of the Stability Nexus.
+  - [ ] is available for download as a release in this repo.
+  - [ ] is available in the relevant app stores.
+- [ ] The web frontend:
+  - [ ] has proper title and metadata.
+  - [ ] has proper open graph metadata, to ensure that it is shown well when shared in social media (Discord, Telegram, Twitter, LinkedIn).
+  - [ ] has a footer, containing the Stability Nexus's logo and pointing to the social media accounts of the Stability Nexus.
+  - [ ] is fully static and client-side.
+  - [ ] is deployed to Github Pages via a Github Workflow.
+  - [ ] is accessible through the <https://TODO:PROJECT-NAME.stability.nexus> domain.
+- [ ] the project is listed in [https://stability.nexus/protocols](https://stability.nexus/protocols).
+
+---
+
+## Architecture
+
+> TODO: Replace with your actual contract architecture. Example below.
+
+```
+src/
+├── TODO_Contract.sol       # Core logic contract
+├── interfaces/
+│   └── ITODO_Contract.sol  # Interface definitions
+└── libraries/
+    └── TODO_Library.sol    # Shared utility library
+
+script/
+├── Deploy.s.sol            # Deployment script
+└── Interactions.s.sol      # Post-deploy interaction scripts
+
+test/
+├── unit/
+│   └── TODO_ContractTest.t.sol
+└── integration/
+    └── TODO_IntegrationTest.t.sol
+```
+
+> **Contract Diagram** (TODO: add a diagram or ASCII art showing contract relationships)
+You can create Web3 architecture diagrams using:
+
+- [Draw.io](https://draw.io)
+- [Excalidraw](https://excalidraw.com)
+- [Lucidchart](https://lucidchart.com)
+- [Mermaid](https://mermaid.js.org) (for code-based diagrams)
+
+Example structure to include:
+
+- Frontend (DApp UI built with React/Next.js)
+- Wallet integration (MetaMask, WalletConnect, Coinbase Wallet)
+- Web3 provider / RPC (Infura, Alchemy, QuickNode)
+- Smart contracts (Solidity contracts deployed on blockchain)
+- Blockchain network (Ethereum, Polygon, Arbitrum, etc.)
+- Decentralized storage (IPFS, Filecoin, Arweave)
+- Indexing services (The Graph or similar)
+- Optional backend services (Node.js APIs, relayers, indexing)
+- Data flow between the frontend, wallet, smart contracts, and blockchain
 
 ---
 
 ## Tech Stack
 
-TODO:
+| Layer | Technology |
+|---|---|
+| Smart Contracts | Solidity `^0.8.x` |
+| Framework | [Foundry](https://getfoundry.sh/) (forge, cast, anvil) |
+| Libraries | OpenZeppelin (via `lib/`) |
 
-### Frontend
+---
 
-TODO:
+## Repository Structure
 
-- Next.js 14+ (React)
-- TypeScript
-- TailwindCSS
-- shadcn/ui
+```
+.
+├── .github/
+│   └── workflows/           # CI, security, gas, fuzz, release pipelines
+├── lib/                     # Foundry dependencies (git submodules)
+├── public/                  # Logos and static assets
+├── script/                  # Forge deployment & interaction scripts
+├── src/                     # Solidity source contracts
+├── test/                    # Forge test suite
+├── .coderabbit.yaml         # CodeRabbit AI review config
+├── .env.example             # Environment variable template
+├── .gitmodules              # Submodule declarations
+├── foundry.toml             # Foundry project config (RPCs, verifiers)
+├── foundry.lock             # Locked dependency versions
+└── README.md
+```
 
-### Blockchain
+---
 
-TODO:
+## 🔗 Repository Links
 
-- Wagmi
-- Solidity Smart Contracts
-- Ethers.js
+TODO: Update with your repository structure
+
+1. [Main Repository](https://github.com/StabilityNexus/TODO)
+2. [Frontend](https://github.com/StabilityNexus/TODO/tree/main/frontend) (if separate)
+3. [contract](https://github.com/StabilityNexus/TODO/tree/main/contract) (if separate)
 
 ---
 
@@ -118,96 +192,267 @@ TODO:
 
 ### Prerequisites
 
-TODO
+| Tool | Version | Install |
+|---|---|---|
+| `git` | any | [git-scm.com](https://git-scm.com/) |
+| `foundryup` | latest | `curl -L https://foundry.paradigm.xyz \| bash` |
+| `forge` / `cast` / `anvil` | latest | run `foundryup` after install |
 
-- Node.js 18+
-- npm/yarn/pnpm
-- MetaMask or any other web3 wallet browser extension
+Verify installation:
+
+```bash
+forge --version   # e.g. forge 0.3.x
+anvil --version
+cast --version
+```
 
 ### Installation
 
-TODO
-
-#### 1. Clone the Repository
-
 ```bash
-git clone https://github.com/StabilityNexus/TODO.git
-cd TODO
+# 1. Clone with submodules
+git clone --recurse-submodules https://github.com/StabilityNexus/Template-Repo-EVM-Contracts.git
+cd Template-Repo-EVM-Contracts
+
+# 2. If you forgot --recurse-submodules
+git submodule update --init --recursive
+
+# 3. Install/update Foundry dependencies
+forge install
 ```
 
-#### 2. Install Dependencies
-
-Using your preferred package manager:
+### Environment Setup
 
 ```bash
-npm install
-# or
-yarn install
-# or
-pnpm install
+cp .env.example .env
 ```
 
-#### 3. Run the Development Server
+Edit `.env` and fill in:
 
-Start the app locally:
+```env
+# Required for deployment
+PRIVATE_KEY=0x...
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+# Required for contract verification
+ETHERSCAN_API_KEY=...
+
+# Optional: override default public RPCs
+RPC_ETHEREUM=https://mainnet.infura.io/v3/YOUR_KEY
+RPC_SEPOLIA=https://sepolia.infura.io/v3/YOUR_KEY
 ```
-
-#### 4. Open your Browser
-
-Navigate to [http://localhost:3000](http://localhost:3000) to see the application.
 
 ---
 
-## Contributing
+## Usage
 
-We welcome contributions of all kinds! To contribute:
+### Build
 
-1. Fork the repository and create your feature branch (`git checkout -b feature/AmazingFeature`).
-2. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
-3. Run the development workflow commands to ensure code quality:
-   - `npm run format:write`
-   - `npm run lint:fix`
-   - `npm run typecheck`
-4. Push your branch (`git push origin feature/AmazingFeature`).
-5. Open a Pull Request for review.
+```bash
+forge build
+```
 
-If you encounter bugs, need help, or have feature requests:
+### Test
 
-- Please open an issue in this repository providing detailed information.
-- Describe the problem clearly and include any relevant logs or screenshots.
+```bash
+# Run all tests
+forge test
 
-We appreciate your feedback and contributions!
+# Verbose output (shows logs and traces)
+forge test -vvv
+
+# Run a specific test file
+forge test --match-path test/unit/TODO_ContractTest.t.sol
+
+# Run a specific test function
+forge test --match-test testTransfer -vvv
+```
+
+### Coverage
+
+```bash
+forge coverage
+
+# Generate LCOV report
+forge coverage --report lcov
+genhtml lcov.info --output-directory coverage/
+```
+
+### Gas Snapshot
+
+```bash
+# Generate snapshot
+forge snapshot
+
+# Compare against last snapshot
+forge snapshot --diff
+```
+
+### Format & Lint
+
+```bash
+forge fmt          # Format Solidity files
+forge fmt --check  # Check without writing (used in CI)
+```
 
 ---
 
-## Contract Automation Template
+## Deployment
 
-This repository includes baseline workflows for Solidity contract projects:
+> Make sure your `.env` is configured before deploying.
 
-- CI (`.github/workflows/ci.yml`): format, build, test, coverage
-- Security scan (`.github/workflows/security-slither.yml`): static analysis
-- Gas snapshot (`.github/workflows/gas-snapshot.yml`): baseline and regression checks
-- Nightly fuzz (`.github/workflows/nightly-fuzz.yml`): deeper fuzz/invariant execution
-- Release artifacts (`.github/workflows/release.yml`): tag-based artifact publishing
+### Testnet
 
-The repo ships with public RPC endpoints in `foundry.toml` for:
-`ethereum`, `ethereum_classic`, `bsc`, `base`, `polygon`, `avalanche`, `sepolia`, `mordor`.
+```bash
+# Deploy to Sepolia (Ethereum testnet)
+forge script script/Deploy.s.sol \
+  --rpc-url sepolia \
+  --broadcast \
+  --verify \
+  -vvvv
 
-For deploy flows, copy `.env.example` to `.env` and set values for:
+# Deploy to Mordor (Ethereum Classic testnet)
+forge script script/Deploy.s.sol \
+  --rpc-url mordor \
+  --broadcast \
+  -vvvv
+```
 
-- `PRIVATE_KEY`
-- `ETHERSCAN_API_KEY`
+### Mainnet
 
-Contract verification is preconfigured for `mainnet` and `sepolia` in `foundry.toml`.
-For other chains, add the corresponding explorer configuration first.
+```bash
+# Deploy to Ethereum mainnet
+forge script script/Deploy.s.sol \
+  --rpc-url ethereum \
+  --broadcast \
+  --verify \
+  -vvvv
 
-If you need higher reliability or rate limits, replace the RPC URLs in `foundry.toml` with your own provider endpoints.
+# Deploy to Base
+forge script script/Deploy.s.sol \
+  --rpc-url base \
+  --broadcast \
+  --verify \
+  -vvvv
+```
 
-© 2025 The Stable Order.
+> ℹ️ RPC aliases (`sepolia`, `ethereum`, `base`, etc.) are pre-configured in `foundry.toml`.
+
+---
+
+## 🔄 User Flow
+
+TODO: Add user flow diagrams showing how users interact with your application
+
+```
+[User Flow Diagram Placeholder]
+```
+
+### Key User Journeys
+
+TODO: Document main user flows:
+
+1. **User Journey 1**: Description
+   - Step 1
+   - Step 2
+   - Step 3
+
+2. **User Journey 2**: Description
+   - Step 1
+   - Step 2
+   - Step 3
+
+3. **User Journey 3**: Description
+   - Step 1
+   - Step 2
+   - Step 3
+
+---
+
+## Supported Networks
+
+Pre-configured RPC endpoints in `foundry.toml`. Each mainnet has a corresponding official token list maintained in the [StabilityNexus/TokenList](https://github.com/StabilityNexus/TokenList) repository.
+
+| Network | Type | Chain ID | Token List |
+|---|---|---|---|
+| Ethereum | Mainnet | 1 | [ethereum-tokens.json](https://raw.githubusercontent.com/StabilityNexus/TokenList/main/ethereum-tokens.json) |
+| Ethereum Classic | Mainnet | 61 | [ethereum-classic-tokens.json](https://raw.githubusercontent.com/StabilityNexus/TokenList/main/ethereum-classic-tokens.json) |
+| BNB Smart Chain | Mainnet | 56 | [binance-smart-chain-tokens.json](https://raw.githubusercontent.com/StabilityNexus/TokenList/main/binance-smart-chain-tokens.json) |
+| Base | Mainnet | 8453 | [base-tokens.json](https://raw.githubusercontent.com/StabilityNexus/TokenList/main/base-tokens.json) |
+| Polygon PoS | Mainnet | 137 | [polygon-pos-tokens.json](https://raw.githubusercontent.com/StabilityNexus/TokenList/main/polygon-pos-tokens.json) |
+| Cardano Milkomeda | Mainnet | — | [cardano's-milkomeda-tokens.json](https://raw.githubusercontent.com/StabilityNexus/TokenList/main/cardano's-milkomeda-tokens.json) |
+
+| Sepolia | Testnet | 11155111 | _(testnet — no token list)_ |
+| Mordor (ETC) | Testnet | 63 | _(testnet — no token list)_ |
+
+> 📋 Token lists follow the URL pattern:
+>
+> ```
+> https://raw.githubusercontent.com/StabilityNexus/TokenList/main/<chain>-tokens.json
+> ```
+>
+> To integrate these lists in your contracts or frontend, fetch the JSON directly from the above raw URLs. To add or update tokens, open a PR in the [TokenList repo](https://github.com/StabilityNexus/TokenList).
+
+>Contract verification is pre-configured for **Ethereum mainnet** and **Sepolia**. For other chains, add the corresponding explorer config to `foundry.toml`
+---
+
+## CI/CD Workflows
+
+| Workflow | Trigger | What it does |
+|---|---|---|
+| `ci.yml` | Push / PR | Format check → Build → Unit tests → Coverage report |
+| `security-slither.yml` | Push / PR | Slither static analysis for vulnerabilities |
+| `gas-snapshot.yml` | Push / PR | Gas baseline and regression checks |
+| `nightly-fuzz.yml` | Nightly (cron) | Deep fuzz & invariant testing |
+| `release.yml` | Tag push | Builds and publishes release artifacts |
+
+---
+
+## Security
+
+- Static analysis is run on every PR via **Slither** (see `.github/workflows/security-slither.yml`)
+- **CodeRabbit** AI review is enabled via `.coderabbit.yaml`
+- Deep fuzz runs nightly to catch edge cases
+
+> Found a vulnerability? Please **do not open a public issue**. Contact the Stability Nexus team privately via [Discord](https://discord.gg/YzDKeEfWtS) or [Telegram](https://t.me/StabilityNexus).
+
+---
+
+## 📱 App Screenshots
+
+TODO: Add screenshots showcasing your application
+
+|  |  |  |
+|---|---|---|
+| Screenshot 1 | Screenshot 2 | Screenshot 3 |
+
+---
+
+## 🙌 Contributing
+
+⭐ Don't forget to star this repository if you find it useful! ⭐
+
+Thank you for considering contributing to this project! Contributions are highly appreciated and welcomed. To ensure smooth collaboration, please refer to our [Contribution Guidelines](./CONTRIBUTING.md).
+
+---
+
+## ✨ Maintainers
+
+TODO: Add maintainer information
+
+- [Maintainer Name](https://github.com/username)
+- [Maintainer Name](https://github.com/username)
+
+---
+
+## 📍 License
+
+See the [LICENSE](LICENSE) file for details.
+
+---
+
+## 💪 Thanks To All Contributors
+
+Thanks a lot for spending your time helping TODO grow. Keep rocking 🥂
+
+[![Contributors](https://contrib.rocks/image?repo=StabilityNexus-Org/TODO)](https://github.com/StabilityNexus-Org/TODO/graphs/contributors)
+
+© 2025 StabilityNexus
