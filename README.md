@@ -96,7 +96,7 @@ TODO: In the checklist below, mark the items that have been completed and delete
   - [ ] has proper open graph metadata, to ensure that it is shown well when shared in social media (Discord, Telegram, Twitter, LinkedIn).
   - [ ] has a footer, containing the Stability Nexus's logo and pointing to the social media accounts of the Stability Nexus.
   - [ ] is fully static and client-side.
-  - [ ] is deployed to Github Pages via a Github Workflow.
+  - [ ] is deployed to GitHub Pages via a GitHub Workflow.
   - [ ] is accessible through the <https://TODO:PROJECT-NAME.stability.nexus> domain.
 - [ ] the project is listed in [https://stability.nexus/protocols](https://stability.nexus/protocols).
 
