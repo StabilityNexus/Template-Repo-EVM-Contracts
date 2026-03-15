@@ -336,19 +336,9 @@ Pre-configured RPC endpoints in `foundry.toml`. Each mainnet has a corresponding
 | Base | Mainnet | 8453 | [base-tokens.json](https://raw.githubusercontent.com/StabilityNexus/TokenList/main/base-tokens.json) |
 | Polygon PoS | Mainnet | 137 | [polygon-pos-tokens.json](https://raw.githubusercontent.com/StabilityNexus/TokenList/main/polygon-pos-tokens.json) |
 | Cardano Milkomeda | Mainnet | — | [cardano's-milkomeda-tokens.json](https://raw.githubusercontent.com/StabilityNexus/TokenList/main/cardano's-milkomeda-tokens.json) |
-
 | Sepolia | Testnet | 11155111 | _(testnet — no token list)_ |
 | Mordor (ETC) | Testnet | 63 | _(testnet — no token list)_ |
 
-> 📋 Token lists follow the URL pattern:
->
-> ```text
-> https://raw.githubusercontent.com/StabilityNexus/TokenList/main/<chain>-tokens.json
-> ```
->
-> To integrate these lists in your contracts or frontend, fetch the JSON directly from the above raw URLs. To add or update tokens, open a PR in the [TokenList repo](https://github.com/StabilityNexus/TokenList).
-
->Contract verification is pre-configured for **Ethereum mainnet** and **Sepolia**. For other chains, add the corresponding explorer config to `foundry.toml`
 ---
 
 ## CI/CD Workflows
