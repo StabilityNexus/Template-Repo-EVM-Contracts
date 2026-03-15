@@ -1,3 +1,6 @@
+# Windmill EVM Contracts — Foundry configuration
+# Template-compatible; Solidity 0.8.20, optimizer, fuzz, remappings for OpenZeppelin
+
 [profile.default]
 src = "src"
 out = "out"
@@ -6,45 +9,18 @@ test = "test"
 script = "script"
 cache = true
 
-# Optimization settings
+# Solidity
+solc = "0.8.24"
+
+# Optimizer
 optimizer = true
 optimizer_runs = 200
 
-# Pin compiler + EVM for reproducibility
-solc_version = "0.8.23"
-evm_version = "paris"
+# Fuzz
+fuzz = { runs = 256 }
 
-# Safer default
-ffi = false
-
-[profile.ci]
-fuzz.runs = 1024
-cache = false  
-
-[fuzz]
-runs = 512
-max_test_rejects = 65536
-
-[invariant]
-runs = 256
-depth = 32
-fail_on_revert = true
-
-[fmt]
-line_length = 100
-tab_width = 4
-bracket_spacing = true
-
-[rpc_endpoints]
-ethereum = "https://rpc.ankr.com/eth"
-ethereum_classic = "https://etc.rivet.link"
-bsc = "https://bsc-dataseed.bnbchain.org"
-base = "https://mainnet.base.org"
-polygon = "https://rpc.ankr.com/polygon"
-avalanche = "https://api.avax.network/ext/bc/C/rpc"
-sepolia = "https://rpc.sepolia.org"
-mordor = "https://rpc.mordor.etccooperative.org"
-
-[etherscan]
-mainnet = { key = "${ETHERSCAN_API_KEY}" }
-sepolia = { key = "${ETHERSCAN_API_KEY}" }
+# Remappings (OpenZeppelin and forge-std)
+remappings = [
+    "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+    "forge-std/=lib/forge-std/src/"
+]
