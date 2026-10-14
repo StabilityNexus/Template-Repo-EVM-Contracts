@@ -45,4 +45,4 @@ jobs:
           
       - name: Run deep fuzz tests
         if: steps.gate.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
-        run: forge test --fuzz-runs 10000 --invariant-runs 1000 -vvv
+        run: FOUNDRY_INVARIANT_RUNS=1000 forge test --fuzz-runs 10000 -vvv
