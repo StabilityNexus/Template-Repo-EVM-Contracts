@@ -24,11 +24,25 @@ jobs:
         with:
           persist-credentials: false
           submodules: recursive
+          # The gate below needs the commit history, not just the tip.
+          fetch-depth: 0
+
+      # A nightly run on an unchanged main only burns minutes; a manual dispatch always runs.
+      - name: Skip unless main changed in the last 24h
+        id: gate
+        run: |
+          if [ -z "$(git log origin/main --since=24.hours --format=%H)" ]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Install Foundry
+        if: steps.gate.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: "1.5.1"
           
       - name: Run deep fuzz tests
-        run: forge test --fuzz-runs 10000 --invariant-runs 1000 -vvv
+        if: steps.gate.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
+        run: FOUNDRY_INVARIANT_RUNS=1000 forge test --fuzz-runs 10000 -vvv
